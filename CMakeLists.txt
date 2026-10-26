@@ -11,8 +11,16 @@ find_package(PkgConfig REQUIRED)
 # Needed to find libcdio
 pkg_check_modules(LIBCDIO REQUIRED IMPORTED_TARGET libcdio)
 
+
+find_package(Qt6 REQUIRED
+    COMPONENTS
+        Core
+)
+
+qt_standard_project_setup(REQUIRES 6.12.0)
+
 # So our executable is called "CdRipper"
-add_executable(CdRipper)
+qt_add_executable(CdRipper)
 
 # Compile this code into the executable
 target_sources(CdRipper
@@ -24,4 +32,5 @@ target_sources(CdRipper
 target_link_libraries(CdRipper
     PRIVATE
         PkgConfig::LIBCDIO
+        Qt6::Core
 )

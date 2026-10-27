@@ -26,6 +26,8 @@ qt_add_executable(CdRipper)
 target_sources(CdRipper
     PRIVATE
         src/main.cc
+        src/core/Driver.cc
+        src/core/Driver.h
 )
 
 # Compile these libraries into the executable

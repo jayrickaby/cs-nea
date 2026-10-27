@@ -7,6 +7,7 @@
 struct CdIoDeleterFunctor {
     void operator()(CdIo_t* p){
         if (p) {
+            // Free memory to prevent memory leak
             cdio_destroy(p);
         }
     }

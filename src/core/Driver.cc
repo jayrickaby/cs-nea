@@ -3,11 +3,15 @@
 Driver::Driver()
     {};
 
-bool Driver::isDriverAvailable() {
+bool Driver::isDriverAvailable() const {
     return (m_driver.get());
 }
 
-QString Driver::getDriverName() {
+CdInfo Driver::getCdInfo() const {
+    return m_cdInfo;
+}
+
+QString Driver::getDriverName() const {
     // Check that invalid memory isn't being accessed
     if (m_driver.get()) {
         return cdio_get_driver_name(m_driver.get());
@@ -16,7 +20,7 @@ QString Driver::getDriverName() {
     return {};
 }
 
-QString Driver::getDefaultDeviceName() {
+QString Driver::getDefaultDeviceName() const {
     // Check that invalid memory isn't being accessed
     if (m_driver.get()) {
         return cdio_get_default_device(m_driver.get());
@@ -25,7 +29,7 @@ QString Driver::getDefaultDeviceName() {
     return {};
 }
 
-QStringList Driver::getDeviceNames() {
+QStringList Driver::getDeviceNames() const {
     char** drives {cdio_get_devices(DRIVER_DEVICE)};
     
     QStringList list;
@@ -44,4 +48,5 @@ QStringList Driver::getDeviceNames() {
 
 void Driver::refresh() {
     m_driver.reset(cdio_open(nullptr, DRIVER_DEVICE));
+    m_cdInfo.refresh(m_driver.get());
 }

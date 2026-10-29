@@ -1,6 +1,7 @@
 #include <QDebug>
 
 #include "core/Driver.h"
+#include "core/TrackInfo.h"
 
 int main() {
     Driver driver;
@@ -26,9 +27,11 @@ int main() {
     qDebug() << "CD Total Tracks:" << cdInfo.getTotalTracks();
 
     for (int i = 0; i < cdInfo.getTotalTracks(); i++) {
-        int track {i + cdInfo.getFirstTrack()};
+        int num {i + cdInfo.getFirstTrack()};
 
-        qDebug() << "Track:" << track << ", LSN:" << cdInfo.getTrackLSN(track);
+        TrackInfo track {cdInfo.getTrack(num)};
+
+        qDebug() << "Track:" << track.number << ", LSN:" << track.lsn << ", Sectors:" << track.sectors;
     }
 
     return 0;

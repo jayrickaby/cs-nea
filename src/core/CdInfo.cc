@@ -2,8 +2,7 @@
 
 CdInfo::CdInfo()
   : m_discMode(CDIO_DISC_MODE_NO_INFO),
-    m_firstTrack(0),
-    m_totalTracks(0)
+    m_firstTrack(0)
     {};
 
 bool CdInfo::isCdAvailable() const {
@@ -15,44 +14,50 @@ int CdInfo::getFirstTrack() const {
 }
 
 int CdInfo::getTotalTracks() const {
-    return m_totalTracks;
+    return m_tracks.size();
 }
 
-int CdInfo::getTrackLSN(int track) const {
-    if (m_trackLSNs.contains(track)) {
-        return m_trackLSNs[track];
+TrackInfo CdInfo::getTrack(int track) const {
+    if (m_tracks.contains(track)) {
+        return m_tracks[track];
     }
-
-    return -1;
+    return {};
 }
 
 void CdInfo::refresh(CdIo_t* driver) {
-    m_firstTrack = 0;
-    m_totalTracks = 0;
-    m_trackLSNs.clear();
     m_discMode = CDIO_DISC_MODE_NO_INFO;
+    m_firstTrack = 0;
+    m_tracks.clear();
 
     if (!driver) {
         return;
     }
 
-    // Check whether CD can be read before trying to read
     m_discMode = cdio_get_discmode(driver);
     
+    // Check whether CD can be read before trying to read
     if (!isCdAvailable()) {
         return;
     }
 
     m_firstTrack = cdio_get_first_track_num(driver);
-    m_totalTracks = cdio_get_num_tracks(driver); 
+    int totalTracksNumber = cdio_get_num_tracks(driver); 
 
-    if (m_totalTracks <= 0) {
+    if (totalTracksNumber <= 0) {
         return;
     }
 
-    for (int i = 0; i < m_totalTracks; i++) {
-        int track {i + m_firstTrack};
+    m_tracks.reserve(totalTracksNumber);
 
-        m_trackLSNs[track] = cdio_get_track_lsn(driver, track);
+    for (int i = 0; i < totalTracksNumber; i++) {
+        int num {i + m_firstTrack};
+
+        TrackInfo track {
+            .lsn = cdio_get_track_lsn(driver, num),
+            .number = num,
+            .sectors = cdio_get_track_sec_count(driver, num)
+        };
+
+        m_tracks[num] = track;
     }
 }

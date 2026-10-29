@@ -7,6 +7,8 @@
 #include <QHash>
 #include <QDebug>
 
+#include "TrackInfo.h"
+
 class CdInfo {
 public:
     CdInfo();
@@ -15,15 +17,14 @@ public:
 
     int getFirstTrack() const;
     int getTotalTracks() const;
-    int getTrackLSN(int track) const;
+    TrackInfo getTrack(int track) const;
 
     void refresh(CdIo_t* driver);
 
 private:
     discmode_t m_discMode;
     int m_firstTrack;
-    int m_totalTracks;
-    QHash<int, int> m_trackLSNs;
+    QHash<int, TrackInfo> m_tracks;
 };
 
 #endif 

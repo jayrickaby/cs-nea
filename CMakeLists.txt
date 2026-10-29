@@ -30,6 +30,7 @@ target_sources(CdRipper
         src/core/CdInfo.h
         src/core/Driver.cc
         src/core/Driver.h
+        src/core/TrackInfo.h
 )
 
 # Compile these libraries into the executable

@@ -10,6 +10,8 @@ find_package(PkgConfig REQUIRED)
 
 # Needed to find libcdio
 pkg_check_modules(LIBCDIO REQUIRED IMPORTED_TARGET libcdio)
+pkg_check_modules(LIBCDIO_CDDA REQUIRED IMPORTED_TARGET libcdio_cdda)
+pkg_check_modules(LIBCDIO_PARANOIA REQUIRED IMPORTED_TARGET libcdio_paranoia)
 
 
 find_package(Qt6 REQUIRED
@@ -37,5 +39,7 @@ target_sources(CdRipper
 target_link_libraries(CdRipper
     PRIVATE
         PkgConfig::LIBCDIO
+        PkgConfig::LIBCDIO_CDDA
+        PkgConfig::LIBCDIO_PARANOIA
         Qt6::Core
 )

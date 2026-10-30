@@ -1,9 +1,11 @@
 #include <QDebug>
+#include <cdio/paranoia/cdda.h>
 
 #include "core/Driver.h"
 #include "core/TrackInfo.h"
 
 int main() {
+    qDebug() << "CDDA Version:" << cdio_cddap_version();
     Driver driver;
     driver.refresh();
     

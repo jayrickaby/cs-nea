@@ -4,7 +4,7 @@ Driver::Driver()
     {};
 
 bool Driver::isDriverAvailable() const {
-    return (m_driver.get());
+    return m_cdio.get();
 }
 
 CdInfo Driver::getCdInfo() const {
@@ -13,8 +13,8 @@ CdInfo Driver::getCdInfo() const {
 
 QString Driver::getDriverName() const {
     // Check that invalid memory isn't being accessed
-    if (m_driver.get()) {
-        return cdio_get_driver_name(m_driver.get());
+    if (m_cdio.get()) {
+        return cdio_get_driver_name(m_cdio.get());
     }
 
     return {};
@@ -22,8 +22,8 @@ QString Driver::getDriverName() const {
 
 QString Driver::getDefaultDeviceName() const {
     // Check that invalid memory isn't being accessed
-    if (m_driver.get()) {
-        return cdio_get_default_device(m_driver.get());
+    if (m_cdio.get()) {
+        return cdio_get_default_device(m_cdio.get());
     }
 
     return {};
@@ -47,6 +47,31 @@ QStringList Driver::getDeviceNames() const {
 }
 
 void Driver::refresh() {
-    m_driver.reset(cdio_open(nullptr, DRIVER_DEVICE));
-    m_cdInfo.refresh(m_driver.get());
+    // Safely reset
+    m_drive.reset();
+    m_cdio.reset();
+
+    // Get audio-only devices
+    char **devices {cdio_get_devices_with_cap(nullptr, CDIO_FS_AUDIO, false)};
+
+    if (!devices) {
+        return;
+    }
+
+    m_cdio.reset(cdio_open(*devices, DRIVER_UNKNOWN));
+
+    // Free up memory to prevent memory leak
+    cdio_free_device_list(devices);
+
+    if (!m_cdio) {
+        return;
+    }
+
+    m_drive.reset(cdio_cddap_identify_cdio(m_cdio.get(), CDDA_MESSAGE_PRINTIT, nullptr));
+
+    if (!m_drive) {
+        return;
+    }
+
+    m_cdInfo.refresh(m_cdio.get());
 }

@@ -1,3 +1,5 @@
+#include <QBuffer>
+#include <QByteArray>
 #include <QDebug>
 #include <cdio/paranoia/cdda.h>
 
@@ -34,6 +36,26 @@ int main() {
 
         qDebug() << "Track:" << track.number << ", LSN:" << track.lsn << ", Sectors:" << track.sectors;
     }
+
+    QByteArray data;
+    QBuffer buffer(&data);
+
+    if (!buffer.open(QIODevice::WriteOnly)) {
+        qDebug() << "Failed to open buffer for writing.";
+            return -1;
+    }
+
+    int lsnRange {30};
+    qDebug() << "~ Reading first" << lsnRange << "LSN of track 3 ~";
+
+    lsn_t begin {cdInfo.getTrack(3).lsn};
+
+    if (!driver.readSectorsToBuffer(begin, begin + lsnRange, &buffer)) {
+        qDebug () << "Failed to read.";
+        return -1;
+    }
+
+    qDebug() << "Read" << data.size() << "bytes";
 
     return 0;
 }

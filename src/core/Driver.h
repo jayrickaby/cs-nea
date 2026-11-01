@@ -6,6 +6,8 @@
 #include <cdio/cdio.h>
 #include <cdio/cd_types.h>
 #include <cdio/paranoia/cdda.h>
+#include <cdio/paranoia/paranoia.h>
+#include <QIODevice>
 #include <QString>
 #include <QStringList>
 
@@ -35,6 +37,7 @@ public:
     Driver();
 
     bool isDriverAvailable() const;
+    bool readSectorsToBuffer(lsn_t begin, lsn_t end, QIODevice* output);
 
     CdInfo getCdInfo() const;
 

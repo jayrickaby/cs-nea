@@ -5,7 +5,6 @@
 #include "core/TrackInfo.h"
 
 int main() {
-    qDebug() << "CDDA Version:" << cdio_cddap_version();
     Driver driver;
     driver.refresh();
     

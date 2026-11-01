@@ -36,6 +36,8 @@ bool Driver::readSectorsToBuffer(lsn_t begin, lsn_t end, QIODevice* output) {
     }
 
     cdrom_paranoia_t *paranoia {paranoia_init(m_drive.get())};
+
+    // skip over failed attempts
     paranoia_modeset(paranoia, PARANOIA_MODE_FULL^PARANOIA_MODE_NEVERSKIP);
     
     cdda_verbose_set(m_drive.get(), CDDA_MESSAGE_PRINTIT, CDDA_MESSAGE_PRINTIT);
@@ -63,6 +65,7 @@ bool Driver::readSectorsToBuffer(lsn_t begin, lsn_t end, QIODevice* output) {
             continue;
         }
 
+        // convert to actual characters
         qint64 written {output->write(reinterpret_cast<const char*>(raw), CDIO_CD_FRAMESIZE_RAW)};
         if (written != CDIO_CD_FRAMESIZE_RAW) {
             qDebug() << "Data written to output device does not match raw CD framesize!";

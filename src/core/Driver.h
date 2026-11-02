@@ -38,14 +38,13 @@ public:
 
     bool isDriverAvailable() const;
     bool readSectorsToBuffer(lsn_t begin, lsn_t end, QIODevice* output);
+    bool refresh();
 
     CdInfo getCdInfo() const;
 
     QString getDriverName() const;
     QString getDefaultDeviceName() const;
     QStringList getDeviceNames() const;
-
-    void refresh();
 
 private:
     std::unique_ptr<CdIo_t, CdIoDeleterFunctor> m_cdio;

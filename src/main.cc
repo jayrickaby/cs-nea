@@ -8,10 +8,13 @@
 
 int main() {
     Driver driver;
-    driver.refresh();
+    if (!driver.refresh()) {
+        qDebug() << "Failed to refresh driver!";
+        return -1;
+    }
     
     if (!driver.isDriverAvailable()) {
-        qDebug() << "CD Driver is not available";
+        qDebug() << "CD Driver is not available!";
         return -1;
     }
 
@@ -22,7 +25,7 @@ int main() {
     CdInfo cdInfo {driver.getCdInfo()};
 
     if (!cdInfo.isCdAvailable()) {
-        qDebug() << "CD is not available.";
+        qDebug() << "CD is not available!";
         return -1;
     }
 
@@ -41,7 +44,7 @@ int main() {
     QBuffer buffer(&data);
 
     if (!buffer.open(QIODevice::WriteOnly)) {
-        qDebug() << "Failed to open buffer for writing.";
+        qDebug() << "Failed to open buffer for writing!";
             return -1;
     }
 
@@ -51,7 +54,7 @@ int main() {
     lsn_t begin {cdInfo.getTrack(3).lsn};
 
     if (!driver.readSectorsToBuffer(begin, begin + lsnRange, &buffer)) {
-        qDebug () << "Failed to read.";
+        qDebug () << "Failed to read CD!";
         return -1;
     }
 

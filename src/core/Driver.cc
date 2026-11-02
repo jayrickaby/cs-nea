@@ -118,7 +118,7 @@ QStringList Driver::getDeviceNames() const {
     return list;
 }
 
-void Driver::refresh() {
+bool Driver::refresh() {
     // Safely reset
     m_drive.reset();
     m_cdio.reset();
@@ -127,7 +127,8 @@ void Driver::refresh() {
     char **devices {cdio_get_devices_with_cap(nullptr, CDIO_FS_AUDIO, false)};
 
     if (!devices) {
-        return;
+        qDebug() << "No audio devices found!";
+        return false;
     }
 
     m_cdio.reset(cdio_open(*devices, DRIVER_UNKNOWN));
@@ -136,20 +137,26 @@ void Driver::refresh() {
     cdio_free_device_list(devices);
 
     if (!m_cdio) {
-        return;
+        qDebug() << "Failed to open CdIo!";
+        return false;
     }
 
     m_drive.reset(cdio_cddap_identify_cdio(m_cdio.get(), CDDA_MESSAGE_PRINTIT, nullptr));
 
     if (!m_drive) {
-        return;
+        qDebug() << "Failed to identify drive from CdIo!";
+        return false;
     }
     
     if (cdda_open(m_drive.get()) != 0) {
         qDebug() << "Unable to open disc!";
-        // TODO: make refresh method a bool so that this and the returns can return false instead
-        throw -5921512;
+        return false;
     }
 
-    m_cdInfo.refresh(m_cdio.get());
+    if (!m_cdInfo.refresh(m_cdio.get())) {
+        qDebug() << "Failed to get CD Info!";
+        return false;
+    }
+
+    return true;
 }

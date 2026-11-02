@@ -24,27 +24,30 @@ TrackInfo CdInfo::getTrack(int track) const {
     return {};
 }
 
-void CdInfo::refresh(CdIo_t* driver) {
+bool CdInfo::refresh(CdIo_t* driver) {
     m_discMode = CDIO_DISC_MODE_NO_INFO;
     m_firstTrack = 0;
     m_tracks.clear();
 
     if (!driver) {
-        return;
+        qDebug() << "No driver detected!";
+        return false;
     }
 
     m_discMode = cdio_get_discmode(driver);
     
     // Check whether CD can be read before trying to read
     if (!isCdAvailable()) {
-        return;
+        qDebug() << "No CD is available!";
+        return false;
     }
 
     m_firstTrack = cdio_get_first_track_num(driver);
     int totalTracksNumber = cdio_get_num_tracks(driver); 
 
     if (totalTracksNumber <= 0) {
-        return;
+        qDebug() << "CD has no tracks!";
+        return false;
     }
 
     m_tracks.reserve(totalTracksNumber);
@@ -60,4 +63,6 @@ void CdInfo::refresh(CdIo_t* driver) {
 
         m_tracks[num] = track;
     }
+
+    return true;
 }

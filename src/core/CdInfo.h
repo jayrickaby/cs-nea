@@ -14,12 +14,11 @@ public:
     CdInfo();
 
     bool isCdAvailable() const;
+    bool refresh(CdIo_t* driver);
 
     int getFirstTrack() const;
     int getTotalTracks() const;
     TrackInfo getTrack(int track) const;
-
-    void refresh(CdIo_t* driver);
 
 private:
     discmode_t m_discMode;

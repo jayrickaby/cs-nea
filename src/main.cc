@@ -12,12 +12,12 @@ int main() {
 
     Driver driver;
     if (!driver.refresh()) {
-        qDebug() << "Failed to refresh driver!";
+        qFatal() << "Failed to refresh driver!";
         return -1;
     }
     
     if (!driver.isDriverAvailable()) {
-        qDebug() << "CD Driver is not available!";
+        qFatal() << "CD Driver is not available!";
         return -1;
     }
 
@@ -28,7 +28,7 @@ int main() {
     CdInfo cdInfo {driver.getCdInfo()};
 
     if (!cdInfo.isCdAvailable()) {
-        qDebug() << "CD is not available!";
+        qFatal() << "CD is not available!";
         return -1;
     }
 
@@ -47,8 +47,8 @@ int main() {
     QFile file("track3.raw");
 
     if (!file.open(QIODevice::WriteOnly)) {
-        qDebug() << "Failed to open buffer for writing!";
-            return -1;
+        qFatal() << "Failed to open file for writing!";
+        return -1;
     }
     
     TrackInfo track {cdInfo.getTrack(3)};
@@ -56,7 +56,7 @@ int main() {
     qDebug() << "~ Reading track 3 ~";
 
     if (!driver.readSectorsToBuffer(track.lsn, track.lsn + track.sectors, &file)) {
-        qDebug () << "Failed to read CD!";
+        qFatal() << "Failed to read CD!";
         return -1;
     }
 

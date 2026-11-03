@@ -71,8 +71,6 @@ int main() {
 
         qDebug() << "Track:" << track.number << ", LSN:" << track.lsn << ", Sectors:" << track.sectors;
     }
-    QBuffer buffer(&data);
-
     QFile file("track3.raw");
 
     if (!file.open(QIODevice::WriteOnly)) {

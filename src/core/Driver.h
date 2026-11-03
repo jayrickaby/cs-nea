@@ -15,6 +15,7 @@
 #include "CdInfo.h"
 
 Q_DECLARE_LOGGING_CATEGORY(driver)
+Q_DECLARE_LOGGING_CATEGORY(paranoia)
 
 struct CdIoDeleterFunctor {
     void operator()(CdIo_t* p) {
@@ -48,6 +49,8 @@ public:
     QString getDriverName() const;
     QString getDefaultDeviceName() const;
     QStringList getDeviceNames() const;
+
+    void pollParanoiaLogs() const;
 
 private:
     std::unique_ptr<CdIo_t, CdIoDeleterFunctor> m_cdio;

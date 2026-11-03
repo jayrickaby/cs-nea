@@ -1,6 +1,7 @@
 #include "Driver.h"
 
 Q_LOGGING_CATEGORY(driver, "driver")
+Q_LOGGING_CATEGORY(paranoia, "paranoia")
 
 Driver::Driver()
     {};
@@ -46,7 +47,7 @@ bool Driver::readSectorsToBuffer(lsn_t begin, lsn_t end, QIODevice* output) {
     // skip over failed attempts
     paranoia_modeset(paranoia, PARANOIA_MODE_FULL^PARANOIA_MODE_NEVERSKIP);
     
-    cdda_verbose_set(m_drive.get(), CDDA_MESSAGE_PRINTIT, CDDA_MESSAGE_PRINTIT);
+    cdda_verbose_set(m_drive.get(), CDDA_MESSAGE_LOGIT, CDDA_MESSAGE_LOGIT);
     
     lsn_t cursor;
 
@@ -55,17 +56,9 @@ bool Driver::readSectorsToBuffer(lsn_t begin, lsn_t end, QIODevice* output) {
     for (cursor = begin; cursor < end; cursor++) {
         qCDebug(driver) << "Reading LSN:" << cursor;
         int16_t *raw {paranoia_read(paranoia, nullptr)};
-        char *error {cdda_errors(m_drive.get())};
-        char *message {cdda_messages(m_drive.get())};
+        
+        pollParanoiaLogs();
 
-        if (error) {
-            qCWarning(driver) << error;
-            free(error);
-        }
-        if (message) {
-            qCDebug(driver) << message;
-            free(message);
-        }
         if (!raw) {
             qCWarning(driver) << "No data was retrieved!";
             continue;
@@ -148,7 +141,13 @@ bool Driver::refresh() {
         return false;
     }
 
-    m_drive.reset(cdio_cddap_identify_cdio(m_cdio.get(), CDDA_MESSAGE_PRINTIT, nullptr));
+    char* message {nullptr};
+    m_drive.reset(cdio_cddap_identify_cdio(m_cdio.get(), CDDA_MESSAGE_LOGIT, &message));
+
+    if (message) {
+        qCDebug(paranoia) << message;
+        cdio_cddap_free_messages(message);
+    }
 
     if (!m_drive) {
         qCCritical(driver) << "Failed to identify drive from CdIo!";
@@ -167,4 +166,22 @@ bool Driver::refresh() {
 
     qCDebug(driver) << "Successfully refreshed Driver.";
     return true;
+}
+
+void Driver::pollParanoiaLogs() const {
+    if (!m_drive.get()) {
+        return;
+    }
+
+    char* error = cdda_errors(m_drive.get());
+    if (error) {
+        qCDebug(paranoia) << error;
+        cdio_cddap_free_messages(error);
+    }
+
+    char* message = cdda_messages(m_drive.get());
+    if (message) {
+        qCWarning(paranoia) << error;
+        cdio_cddap_free_messages(message);
+    }
 }

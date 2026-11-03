@@ -2,13 +2,42 @@
 #include <QByteArray>
 #include <QDebug>
 #include <QFile>
+#include <cdio/logging.h>
 #include <cdio/paranoia/cdda.h>
 
 #include "core/Driver.h"
 #include "core/TrackInfo.h"
 
+Q_DECLARE_LOGGING_CATEGORY(cdio)
+Q_LOGGING_CATEGORY(cdio, "cdio")
+
+static void qCdIoLogHandler(cdio_log_level_t level, const char message[]) {
+    switch (level) {
+        case CDIO_LOG_DEBUG:
+              qCDebug(cdio) << message;
+              break;
+        case CDIO_LOG_INFO:
+              qCInfo(cdio) << message;
+              break;
+        case CDIO_LOG_WARN:
+              qCWarning(cdio) << message;
+              break;
+        case CDIO_LOG_ERROR:
+              qCCritical(cdio) << message;
+              break;
+        case CDIO_LOG_ASSERT:
+              qCFatal(cdio) << message;
+              break;
+        default:
+              qCDebug(cdio) << message;
+              break;
+    }
+}
+
 int main() {
     qSetMessagePattern("[%{type}][%{category}]: %{message}");
+
+    cdio_log_set_handler(qCdIoLogHandler);
 
     Driver driver;
     if (!driver.refresh()) {

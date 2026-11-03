@@ -59,11 +59,11 @@ bool Driver::readSectorsToBuffer(lsn_t begin, lsn_t end, QIODevice* output) {
         char *message {cdda_messages(m_drive.get())};
 
         if (error) {
-            qCWarning(driver) << "Error:" << error;
+            qCWarning(driver) << error;
             free(error);
         }
         if (message) {
-            qCWarning(driver) << "Message:" << message;
+            qCDebug(driver) << message;
             free(message);
         }
         if (!raw) {

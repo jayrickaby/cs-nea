@@ -8,10 +8,13 @@
 #include <cdio/paranoia/cdda.h>
 #include <cdio/paranoia/paranoia.h>
 #include <QIODevice>
+#include <QLoggingCategory>
 #include <QString>
 #include <QStringList>
 
 #include "CdInfo.h"
+
+Q_DECLARE_LOGGING_CATEGORY(driver)
 
 struct CdIoDeleterFunctor {
     void operator()(CdIo_t* p) {

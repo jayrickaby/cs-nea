@@ -4,10 +4,13 @@
 #include <sys/types.h>
 
 #include <cdio/cdio.h>
-#include <QHash>
 #include <QDebug>
+#include <QHash>
+#include <QLoggingCategory>
 
 #include "TrackInfo.h"
+
+Q_DECLARE_LOGGING_CATEGORY(cdInfo)
 
 class CdInfo {
 public:

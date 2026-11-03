@@ -8,6 +8,8 @@
 #include "core/TrackInfo.h"
 
 int main() {
+    qSetMessagePattern("[%{type}][%{category}]: %{message}");
+
     Driver driver;
     if (!driver.refresh()) {
         qDebug() << "Failed to refresh driver!";
